@@ -1,51 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixel Mosaic - Support a Dream</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <header>
-        <h1>Help Me Buy My Parents Their Dream House</h1>
-        <p>Click on a pixel, upload your image, and support this journey!</p>
-    </header>
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const app = express();
+const port = 3000;
 
-    <!-- Griglia di pixel -->
-    <div id="grid-container"></div>
+// Imposta la cartella per il salvataggio delle immagini
+const uploadDir = path.join(__dirname, 'uploads');
 
-    <!-- Sezione delle pubblicità -->
-    <div class="ad-section">
-        <p>Your clicks help! This site runs on ads to fund the dream.</p>
-        <!-- Aggiungi qui il codice di Google AdSense -->
-        <div style="margin: 20px auto; text-align: center;">
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="YOUR_ADSENSE_CLIENT_ID"
-                 data-ad-slot="YOUR_AD_SLOT_ID"
-                 data-ad-format="auto"></ins>
-            <script>
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-        </div>
-    </div>
+// Crea la cartella se non esiste
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
 
-    <!-- Input file nascosto -->
-    <input type="file" id="image-upload" style="display: none;" accept="image/*">
-    
-    <!-- Modal per la cella occupata -->
-    <div class="modal" id="cell-occupied-modal">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <h2>This cell is already occupied</h2>
-            <p>Would you like to replace the image or choose a different cell?</p>
-            <button id="choose-different-cell-btn">Choose a different cell</button>
-            <button id="remove-image-btn">Remove Image</button>
-        </div>
-    </div>
+// Configurazione di multer per il salvataggio dei file
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir); // Salva i file nella cartella uploads
+    },
+    filename: (req, file, cb) => {
+        const cellId = req.body.cellId;
+        if (!cellId) {
+            return cb(new Error('Cell ID is missing'));
+        }
+        cb(null, `${cellId}.png`); // Salva con il nome cellId.png
+    },
+});
 
-    <!-- Script per la gestione della logica -->
-    <script src="scripts.js"></script>
-</body>
-</html>
+const upload = multer({ storage });
+
+// Serve i file statici dalla cartella uploads
+app.use('/uploads', express.static(uploadDir));
+
+// Serve i file statici dalla cartella pubblica (CSS, JS, etc.)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Route per caricare l'immagine
+app.post('/uploads', upload.single('image'), (req, res) => {
+    console.log('File uploaded successfully:', req.file);
+    res.sendStatus(200); // Risposta OK
+});
+
+// Rimuove l'immagine
+app.delete('/delete/:cellId', (req, res) => {
+    const cellId = req.params.cellId;
+    const filePath = path.join(uploadDir, `${cellId}.png`);
+    fs.unlink(filePath, (err) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send('Errore nella rimozione del file');
+        }
+        console.log(`File ${filePath} rimosso con successo`);
+        res.sendStatus(200);
+    });
+});
+
+app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+});
