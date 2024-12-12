@@ -9,15 +9,30 @@ const PORT = 3000;
 // Configura la directory per salvare le immagini
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
+    fs.mkdirSync(uploadDir); // Crea la directory uploads se non esiste
 }
 
-// Pulizia opzionale della directory uploads al riavvio del server
-// fs.readdirSync(uploadDir).forEach(file => fs.unlinkSync(path.join(uploadDir, file)));
-
 // Middleware per analizzare i dati del body (necessario per i form)
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Analizza i dati form-urlencoded
+app.use(express.json()); // Analizza i dati JSON
+
+// Middleware per gestire i dati di form prima del caricamento del file
+const preMulterMiddleware = (req, res, next) => {
+    const busboy = require('busboy');
+    const form = new busboy({ headers: req.headers });
+
+    req.body = {}; // Prepara un oggetto body vuoto
+    form.on('field', (fieldname, val) => {
+        req.body[fieldname] = val; // Salva i campi form-data in req.body
+    });
+
+    form.on('file', (fieldname, file, filename) => {
+        req.fileStream = { fieldname, file, filename }; // Salva il file per Multer
+    });
+
+    form.on('finish', () => next());
+    req.pipe(form);
+};
 
 // Configurazione di Multer per gestire i file caricati
 const storage = multer.diskStorage({
@@ -49,16 +64,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(uploadDir)); // Serve le immagini dalla directory uploads
 
 // Endpoint per il caricamento delle immagini
-app.post('/upload', upload.single('image'), (req, res) => {
+app.post('/upload', preMulterMiddleware, upload.single('image'), (req, res) => {
     try {
         if (!req.file) {
             console.error('Errore: Nessun file caricato');
             return res.status(400).json({ error: 'No file uploaded' });
-        }
-
-        if (!req.body.cellId) {
-            console.error('Errore: Nessun cellId ricevuto');
-            return res.status(400).json({ error: 'Cell ID is missing' });
         }
 
         const imageUrl = `/uploads/${req.file.filename}`; // Costruisci l'URL dell'immagine

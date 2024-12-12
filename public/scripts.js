@@ -80,7 +80,6 @@ imageUploadInput.onchange = async (event) => {
     const file = event.target.files[0];
     console.log('File selezionato:', file);
 
-    // Verifica che il file sia un'immagine
     if (!file || !file.type.startsWith('image/')) {
         alert('Per favore seleziona un file immagine valido.');
         return;
@@ -88,32 +87,30 @@ imageUploadInput.onchange = async (event) => {
 
     console.log('File valido', file.name);
     const formData = new FormData();
-    formData.append('image', file); // Aggiungi il file al form data
+    formData.append('image', file);
 
-    // Controlla se il cellId è valido
     if (!selectedCell.dataset.cellId) {
         console.error('Errore: cellId mancante');
         alert('Errore: cellId mancante');
         return;
     }
-    console.log('cellId:', selectedCell.dataset.cellId); // Log per confermare il valore di cellId
-    formData.append('cellId', selectedCell.dataset.cellId); // Invia l'ID della cella
+    console.log('cellId:', selectedCell.dataset.cellId);
+    formData.append('cellId', selectedCell.dataset.cellId);
+
+    // Debug: Verifica i dati nel FormData
+    console.log('Dati inviati nel FormData:');
+    formData.forEach((value, key) => {
+        console.log(`${key}: ${value}`);
+    });
 
     try {
-        console.log('Caricamento immagine per la cella:', selectedCell.dataset.cellId);
-
-        // Disabilita l'input durante il caricamento
-        imageUploadInput.disabled = true;
-
-        // Invio del file al server
         const response = await fetch('/upload', {
             method: 'POST',
             body: formData,
         });
 
-        // Controllo della risposta del server
         if (response.ok) {
-            const data = await response.json(); // Supponiamo che il server ritorni `{ imageUrl: "..." }`
+            const data = await response.json();
             selectedCell.style.backgroundImage = `url(${data.imageUrl})`;
             selectedCell.style.backgroundSize = 'cover';
             selectedCell.style.backgroundPosition = 'center';
@@ -127,8 +124,9 @@ imageUploadInput.onchange = async (event) => {
         console.error('Errore durante la richiesta al server:', error);
         alert('Errore durante la richiesta al server.');
     } finally {
-        imageUploadInput.disabled = false; // Riabilita l'input
-        imageUploadInput.value = ''; // Resetta l'input per consentire più upload
-        selectedCell = null; // Resetta la cella selezionata
+        imageUploadInput.disabled = false;
+        imageUploadInput.value = '';
+        selectedCell = null;
     }
 };
+
