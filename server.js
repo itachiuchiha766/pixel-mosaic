@@ -1,96 +1,98 @@
-// Importa le dipendenze necessarie
 const express = require("express");
 const multer = require("multer");
-const Busboy = require("busboy");
 const path = require("path");
 const fs = require("fs");
+const sharp = require("sharp"); // Aggiungi questa libreria per ridimensionamento
 
 const app = express();
 const PORT = 3000;
 
-// Configura la directory per salvare le immagini
 const uploadDir = path.join(__dirname, "uploads");
+const databaseFile = path.join(__dirname, "image_database.json");
+
+// Assicurati che la directory e il file esistano
 if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir); // Crea la directory uploads se non esiste
+  fs.mkdirSync(uploadDir);
 }
 
-// Middleware per analizzare i dati del body (necessario per i form)
-app.use(express.urlencoded({ extended: true })); // Analizza i dati form-urlencoded
-app.use(express.json()); // Analizza i dati JSON
+// Inizializza database con oggetto vuoto se non esiste
+if (!fs.existsSync(databaseFile)) {
+  fs.writeFileSync(databaseFile, JSON.stringify({}), "utf8");
+}
 
-// Middleware per gestire i dati di form prima del caricamento del file
-// Middleware per gestire i dati di form prima del caricamento del file
-const preMulterMiddleware = (req, res, next) => {
-  if (
-    !req.headers["content-type"] ||
-    !req.headers["content-type"].includes("multipart/form-data")
-  ) {
-    return next(); // Salta se non è multipart/form-data
-  }
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
+app.use("/uploads", express.static(uploadDir));
 
-  const busboy = Busboy({ headers: req.headers }); // Inizializza Busboy senza "new"
+const storage = multer.memoryStorage(); // Cambia a memory storage per sharp
 
-  req.body = {}; // Prepara un oggetto body vuoto
-  busboy.on("field", (fieldname, val) => {
-    req.body[fieldname] = val; // Salva i campi form-data in req.body
-  });
-
-  busboy.on("file", (fieldname, file, filename) => {
-    req.fileStream = { fieldname, file, filename }; // Salva il file per Multer
-  });
-
-  busboy.on("finish", () => {
-    next();
-  });
-
-  req.pipe(busboy); // Collega la richiesta a Busboy
-};
-
-// Configurazione di Multer per gestire i file caricati
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir); // Salva i file nella directory uploads
-  },
-  filename: (req, file, cb) => {
-    const cellId = req.body.cellId; // Ottieni l'ID della cella dal frontend
-    if (!cellId) {
-      return cb(new Error("Cell ID is missing"));
-    }
-    cb(null, `${cellId}.png`); // Salva il file come <cellId>.png
-  },
-});
-
-// Filtro per assicurarsi che solo immagini vengano caricate
 const fileFilter = (req, file, cb) => {
-  if (!file.mimetype.startsWith("image/")) {
-    return cb(new Error("Only image files are allowed"), false);
+  const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+  if (!allowedTypes.includes(file.mimetype)) {
+    return cb(new Error("Solo file immagine consentiti"), false);
   }
   cb(null, true);
 };
 
-// Configura Multer
-const upload = multer({ storage, fileFilter });
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
 
-// Middleware per servire file statici
-app.use(express.static(path.join(__dirname, "public")));
-app.use("/uploads", express.static(uploadDir)); // Serve le immagini dalla directory uploads
-
-// Endpoint per il caricamento delle immagini
-app.post("/upload", preMulterMiddleware, upload.single("image"), (req, res) => {
+function updateImageDatabase(cellId, imageUrl) {
   try {
-    if (!req.file) {
-      console.error("Errore: Nessun file caricato");
-      return res.status(400).json({ error: "No file uploaded" });
+    // Leggi con gestione errori
+    let database = {};
+    try {
+      const rawData = fs.readFileSync(databaseFile, "utf8");
+      database = rawData ? JSON.parse(rawData) : {};
+    } catch (parseError) {
+      console.error("Errore nel parsing del database:", parseError);
     }
 
-    const imageUrl = `/uploads/${req.file.filename}`; // Costruisci l'URL dell'immagine
-    console.log(`File caricato con successo: ${req.file.filename}`);
-    res.status(200).json({ message: "File uploaded successfully", imageUrl });
+    database[cellId] = imageUrl;
+
+    fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2), "utf8");
+  } catch (error) {
+    console.error("Errore nell'aggiornamento del database:", error);
+  }
+}
+
+app.post("/upload", upload.single("image"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "Nessun file caricato" });
+    }
+
+    const cellId = req.body.cellId;
+    if (!cellId) {
+      return res.status(400).json({ error: "Cell ID mancante" });
+    }
+
+    // Ridimensiona l'immagine
+    const resizedImage = await sharp(req.file.buffer)
+      .resize(100, 100, {
+        fit: sharp.fit.cover,
+        position: sharp.strategy.attention,
+      })
+      .png()
+      .toFile(path.join(uploadDir, `${cellId}.png`));
+
+    const imageUrl = `/uploads/${cellId}.png`;
+
+    // Aggiorna database delle immagini
+    updateImageDatabase(cellId, imageUrl);
+
+    res.status(200).json({
+      message: "File caricato con successo",
+      imageUrl,
+      cellId,
+    });
   } catch (error) {
     console.error("Errore durante il caricamento:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while uploading the file" });
+    res.status(500).json({ error: "Errore durante il caricamento del file" });
   }
 });
 
@@ -98,26 +100,49 @@ app.post("/upload", preMulterMiddleware, upload.single("image"), (req, res) => {
 app.delete("/delete/:cellId", (req, res) => {
   const cellId = req.params.cellId;
   const filePath = path.join(uploadDir, `${cellId}.png`);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath); // Elimina il file
-    console.log(`File rimosso: ${filePath}`);
-    res.status(200).json({ message: "File deleted successfully" });
-  } else {
-    console.error("Errore: File non trovato per la cella", cellId);
-    res.status(404).json({ error: "File not found" });
+
+  try {
+    // Rimuovi file se esiste
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    // Aggiorna database delle immagini
+    const rawData = fs.readFileSync(databaseFile, "utf8");
+    const database = JSON.parse(rawData);
+
+    delete database[cellId];
+
+    fs.writeFileSync(databaseFile, JSON.stringify(database, null, 2), "utf8");
+
+    res.status(200).json({
+      message: "File eliminato con successo",
+      cellId,
+    });
+  } catch (error) {
+    console.error("Errore durante l'eliminazione:", error);
+    res.status(500).json({ error: "Errore durante l'eliminazione del file" });
+  }
+});
+
+// Endpoint per ottenere le immagini correnti
+app.get("/current-images", (req, res) => {
+  try {
+    const rawData = fs.readFileSync(databaseFile, "utf8");
+    const database = JSON.parse(rawData);
+    res.status(200).json(database);
+  } catch (error) {
+    console.error("Errore nel recupero delle immagini:", error);
+    res.status(500).json({ error: "Errore nel recupero delle immagini" });
   }
 });
 
 // Gestione degli errori globali
 app.use((err, req, res, next) => {
-  console.error("Errore:", err.message); // Log del messaggio di errore
-  if (err.stack) {
-    console.error("Stack trace:", err.stack); // Log del trace dello stack se disponibile
-  }
+  console.error("Errore:", err.message);
   res.status(500).json({ error: err.message });
 });
 
-// Avvia il server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

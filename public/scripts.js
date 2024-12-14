@@ -1,4 +1,3 @@
-// Seleziona il contenitore della griglia, l'input file, e la modale
 const gridContainer = document.getElementById("grid-container");
 const imageUploadInput = document.getElementById("image-upload");
 const modal = document.getElementById("cell-occupied-modal");
@@ -8,23 +7,39 @@ const chooseDifferentCellButton = document.getElementById(
 );
 const removeImageButton = document.getElementById("remove-image-btn");
 
-// Numero totale di celle
 const totalCells = 400;
-
-// Variabile globale per tracciare la cella selezionata
 let selectedCell = null;
 
-// Funzione per mostrare la modale
+// Inizializzazione delle celle con immagini esistenti
+async function initializeCells() {
+  try {
+    const response = await fetch("/current-images");
+    const currentImages = await response.json();
+
+    Object.entries(currentImages).forEach(([cellId, imageUrl]) => {
+      const cell = document.querySelector(
+        `.grid-cell[data-cell-id="${cellId}"]`
+      );
+      if (cell) {
+        cell.style.backgroundImage = `url(${imageUrl})`;
+        cell.style.backgroundSize = "cover";
+        cell.style.backgroundPosition = "center";
+        cell.classList.add("occupied");
+      }
+    });
+  } catch (error) {
+    console.error("Errore nell'inizializzazione delle celle:", error);
+  }
+}
+
 function showModal() {
   modal.style.display = "flex";
 }
 
-// Funzione per chiudere la modale
 function closeModal() {
   modal.style.display = "none";
 }
 
-// Eventi per la modale
 modal.addEventListener("click", (event) => {
   if (event.target === modal) {
     closeModal();
@@ -34,15 +49,25 @@ modal.addEventListener("click", (event) => {
 closeModalButton.addEventListener("click", closeModal);
 chooseDifferentCellButton.addEventListener("click", closeModal);
 
-// Rimuovi immagine dalla cella occupata
-removeImageButton.addEventListener("click", () => {
+removeImageButton.addEventListener("click", async () => {
   const occupiedCell = document.querySelector(".grid-cell.occupied");
   if (occupiedCell) {
-    occupiedCell.style.backgroundImage = "";
-    occupiedCell.classList.remove("occupied");
-    closeModal();
-  } else {
-    console.warn("Nessuna cella occupata trovata.");
+    const cellId = occupiedCell.dataset.cellId;
+
+    try {
+      const response = await fetch(`/delete/${cellId}`, { method: "DELETE" });
+
+      if (response.ok) {
+        occupiedCell.style.backgroundImage = "";
+        occupiedCell.classList.remove("occupied");
+        closeModal();
+      } else {
+        throw new Error("Errore durante la rimozione");
+      }
+    } catch (error) {
+      console.error("Errore:", error);
+      alert("Non è stato possibile rimuovere l'immagine");
+    }
   }
 });
 
@@ -52,7 +77,6 @@ for (let i = 0; i < totalCells; i++) {
   cell.classList.add("grid-cell");
   cell.dataset.cellId = i;
 
-  // Aggiungi evento click alle celle
   cell.addEventListener("click", () => {
     if (cell.classList.contains("occupied")) {
       showModal();
@@ -65,7 +89,8 @@ for (let i = 0; i < totalCells; i++) {
   gridContainer.appendChild(cell);
 }
 
-// Gestione caricamento immagine
+// Caricamento immagine
+// Updated image upload handling in scripts.js
 imageUploadInput.onchange = async (event) => {
   if (!selectedCell) {
     console.error("Errore: nessuna cella selezionata.");
@@ -79,31 +104,56 @@ imageUploadInput.onchange = async (event) => {
     return;
   }
 
-  const formData = new FormData();
-  formData.append("image", file);
-  formData.append("cellId", selectedCell.dataset.cellId);
+  // Create a temporary image to preload and calculate dimensions
+  const tempImg = new Image();
+  tempImg.onload = async () => {
+    const loadingOverlay = document.createElement("div");
+    loadingOverlay.classList.add("loading-overlay");
+    loadingOverlay.innerHTML = `
+      <div class="spinner"></div>
+      <p>Caricamento in corso...</p>
+    `;
+    selectedCell.appendChild(loadingOverlay);
 
-  try {
-    const response = await fetch("/upload", {
-      method: "POST",
-      body: formData,
-    });
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("cellId", selectedCell.dataset.cellId);
 
-    if (response.ok) {
-      const data = await response.json();
-      selectedCell.style.backgroundImage = `url(${data.imageUrl})`;
-      selectedCell.style.backgroundSize = "cover";
-      selectedCell.style.backgroundPosition = "center";
-      selectedCell.classList.add("occupied");
-    } else {
-      const errorMessage = await response.text();
-      alert(`Errore nel caricamento dell'immagine: ${errorMessage}`);
+    try {
+      const response = await fetch("/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Update cell with new image
+        selectedCell.style.backgroundImage = `url(${data.imageUrl})`;
+        selectedCell.style.backgroundSize = "cover"; // Mantieni cover per adattamento
+        selectedCell.style.backgroundPosition = "center"; // Centra l'immagine
+        selectedCell.classList.add("occupied");
+
+        loadingOverlay.remove();
+      } else {
+        throw new Error("Caricamento fallito");
+      }
+    } catch (error) {
+      loadingOverlay.remove();
+      alert(`Errore: ${error.message}`);
+    } finally {
+      imageUploadInput.value = "";
+      selectedCell = null;
     }
-  } catch (error) {
-    alert("Errore durante la richiesta al server.");
-    console.error("Errore:", error);
-  } finally {
-    imageUploadInput.value = "";
-    selectedCell = null;
-  }
+  };
+
+  // Read the file as a data URL to preload
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    tempImg.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 };
+
+// Carica immagini esistenti all'avvio
+initializeCells();

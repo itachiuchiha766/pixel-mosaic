@@ -1,193 +1,236 @@
 /* Reset di base */
 body {
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-    line-height: 1.5;
-    background: linear-gradient(135deg, #0077b6, #00b4d8, #90e0ef);
-    color: #fff;
-    text-align: center;
-    overflow-x: hidden;
+  margin: 0;
+  font-family: "Roboto", sans-serif;
+  line-height: 1.5;
+  background: linear-gradient(135deg, #0077b6, #00b4d8, #90e0ef);
+  color: #fff;
+  text-align: center;
+  overflow-x: hidden;
 }
 
 /* Titolo e descrizione */
 h1 {
-    font-size: 2.5rem;
-    margin: 1rem 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-size: 2.5rem;
+  margin: 1rem 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 p {
-    font-size: 1.2rem;
-    margin: 0.5rem 0 1.5rem;
-    color: #dff6f8;
+  font-size: 1.2rem;
+  margin: 0.5rem 0 1.5rem;
+  color: #dff6f8;
 }
 
 /* Griglia dei pixel */
 #grid-container {
-    display: grid;
-    margin: 2rem auto;
-    width: 90%;
-    max-width: 800px;
-    grid-template-columns: repeat(20, 1fr); /* 20 colonne */
-    gap: 2px; /* Spazio tra le celle */
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-    padding: 10px;
-    border: 2px solid #fff;
+  display: grid;
+  margin: 2rem auto;
+  width: 90%;
+  max-width: 800px;
+  grid-template-columns: repeat(20, 1fr); /* 20 colonne */
+  gap: 2px; /* Spazio tra le celle */
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  padding: 10px;
+  border: 2px solid #fff;
 }
 
 /* Celle dei pixel */
 .grid-cell {
-    width: 100%; /* Adatta ogni cella alla larghezza della colonna */
-    padding-top: 100%; /* Mantiene le celle quadrate */
-    background-color: rgba(255, 255, 255, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    cursor: pointer;
-    transition: transform 0.2s, background-color 0.3s;
-    border-radius: 5px; /* Aggiungi bordi arrotondati per visibilità */
+  width: 100%; /* Adatta ogni cella alla larghezza della colonna */
+  padding-top: 100%; /* Mantiene le celle quadrate */
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+  border-radius: 5px; /* Aggiungi bordi arrotondati per visibilità */
 }
 
-
 .grid-cell img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: none; /* Nascondi immagine per celle vuote */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none; /* Nascondi immagine per celle vuote */
 }
 
 /* Animazione hover */
 .grid-cell:hover {
-    background-color: rgba(255, 255, 255, 0.6);
-    transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.6);
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Animazione delle celle cliccate */
 .grid-cell:active {
-    transform: scale(1);
-    transition: transform 0.1s;
+  transform: scale(1);
+  transition: transform 0.1s;
 }
 
 /* Sezione delle pubblicità */
 .ad-section {
-    margin: 1rem auto;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  margin: 1rem auto;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .ad-section p {
-    font-size: 1.4rem;
-    margin: 0.5rem 0;
-    color: #dff6f8;
-    font-weight: bold;
+  font-size: 1.4rem;
+  margin: 0.5rem 0;
+  color: #dff6f8;
+  font-weight: bold;
 }
 
 /* Pulsante CTA (Call to Action) */
 .ad-section button {
-    background: #00b4d8;
-    color: #fff;
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
+  background: #00b4d8;
+  color: #fff;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
 .ad-section button:hover {
-    background: #0077b6;
+  background: #0077b6;
 }
 
 /* Modale nascosta inizialmente */
 .modal {
-    display: none; /* La modale è nascosta di default */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-trasparente */
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+  display: none; /* La modale è nascosta di default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-trasparente */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
 /* Contenuto della modale */
 .modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 400px;
-    margin: auto;
-    text-align: center;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
+  margin: auto;
+  text-align: center;
 }
-
 
 /* Titolo della modale */
 .modal-content h2 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    color: #0077b6; /* Colore del titolo per renderlo visibile */
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #0077b6; /* Colore del titolo per renderlo visibile */
 }
 
 /* Testo del corpo */
 .modal-content p {
-    font-size: 1rem;
-    color: #333; /* Colore del testo principale */
+  font-size: 1rem;
+  color: #333; /* Colore del testo principale */
 }
 
 /* Bottone di chiusura */
 .close-btn {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-    cursor: pointer;
-    position: absolute;
-    top: 10px;
-    right: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 
 /* Pulsanti della modale */
 button {
-    padding: 10px 20px;
-    margin: 10px;
-    background-color: #0077b6;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
+  padding: 10px 20px;
+  margin: 10px;
+  background-color: #0077b6;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
 }
 
 button:hover {
-    background-color: #005f8a;
+  background-color: #005f8a;
 }
-
 
 /* Mobile-first responsive design */
 @media (max-width: 600px) {
-    #grid-container {
-        grid-template-columns: repeat(10, 1fr); /* 10 colonne su dispositivi piccoli */
-        max-width: 100%;
-    }
+  #grid-container {
+    grid-template-columns: repeat(
+      10,
+      1fr
+    ); /* 10 colonne su dispositivi piccoli */
+    max-width: 100%;
+  }
 
-    h1 {
-        font-size: 2rem;
-    }
+  h1 {
+    font-size: 2rem;
+  }
 
-    p {
-        font-size: 1rem;
-    }
+  p {
+    font-size: 1rem;
+  }
 
-    .ad-section p {
-        font-size: 1.1rem;
-    }
+  .ad-section p {
+    font-size: 1.1rem;
+  }
 
-    .ad-section button {
-        font-size: 0.9rem;
-    }
+  .ad-section button {
+    font-size: 0.9rem;
+  }
+}
+
+.grid-cell.occupied {
+  background-size: cover; /* Ensure image covers the entire cell */
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Prevent image repetition */
+}
+
+.grid-cell {
+  position: relative; /* For absolute positioning of loading overlay */
+  overflow: hidden; /* Clip any overflow */
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
