@@ -1,6 +1,7 @@
+// Importa le dipendenze necessarie
 const express = require("express");
 const multer = require("multer");
-const Busboy = require("busboy"); // Importa Busboy
+const Busboy = require("busboy");
 const path = require("path");
 const fs = require("fs");
 
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true })); // Analizza i dati form-urlenco
 app.use(express.json()); // Analizza i dati JSON
 
 // Middleware per gestire i dati di form prima del caricamento del file
+// Middleware per gestire i dati di form prima del caricamento del file
 const preMulterMiddleware = (req, res, next) => {
   if (
     !req.headers["content-type"] ||
@@ -26,7 +28,7 @@ const preMulterMiddleware = (req, res, next) => {
     return next(); // Salta se non è multipart/form-data
   }
 
-  const busboy = Busboy({ headers: req.headers }); // Crea una nuova istanza di Busboy
+  const busboy = Busboy({ headers: req.headers }); // Inizializza Busboy senza "new"
 
   req.body = {}; // Prepara un oggetto body vuoto
   busboy.on("field", (fieldname, val) => {
