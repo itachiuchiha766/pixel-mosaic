@@ -111,7 +111,7 @@ imageUploadInput.onchange = async (event) => {
     loadingOverlay.classList.add("loading-overlay");
     loadingOverlay.innerHTML = `
       <div class="spinner"></div>
-      <p>Caricamento in corso...</p>
+      <p>Uploading...</p>
     `;
     selectedCell.appendChild(loadingOverlay);
 
