@@ -15,7 +15,6 @@ body {
   font-display: swap;
 }
 
-
 /* Titolo e descrizione */
 h1 {
   font-size: 2.5rem;
@@ -42,6 +41,7 @@ p {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
   padding: 10px;
   border: 2px solid #fff;
+  min-height: 100px; /* Impostato per evitare cambiamenti di altezza imprevisti */
 }
 
 /* Celle dei pixel */
@@ -56,13 +56,15 @@ p {
   border-radius: 5px; /* Aggiungi bordi arrotondati per visibilità */
   overflow: hidden;
   box-sizing: border-box;
+  min-width: 50px; /* Impostato per evitare il layout shift */
+  min-height: 50px; /* Impostato per evitare il layout shift */
 }
 
 .grid-cell img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: none; /* Nascondi immagine per celle vuote */
+  display: block; /* Cambiato da "none" per ridurre il CLS */
 }
 
 /* Animazione hover */
@@ -87,6 +89,7 @@ p {
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   z-index: 10;
+  min-height: 80px; /* Impostato per evitare cambiamenti di altezza */
 }
 
 .ad-section p {
