@@ -1,3 +1,4 @@
+// Seleziona il contenitore della griglia, l'input file, e la modale
 const gridContainer = document.getElementById("grid-container");
 const imageUploadInput = document.getElementById("image-upload");
 const modal = document.getElementById("cell-occupied-modal");
@@ -90,7 +91,6 @@ for (let i = 0; i < totalCells; i++) {
 }
 
 // Caricamento immagine
-// Updated image upload handling in scripts.js
 imageUploadInput.onchange = async (event) => {
   if (!selectedCell) {
     console.error("Errore: nessuna cella selezionata.");
@@ -104,55 +104,43 @@ imageUploadInput.onchange = async (event) => {
     return;
   }
 
-  // Create a temporary image to preload and calculate dimensions
-  const tempImg = new Image();
-  tempImg.onload = async () => {
-    const loadingOverlay = document.createElement("div");
-    loadingOverlay.classList.add("loading-overlay");
-    loadingOverlay.innerHTML = `
-      <div class="spinner"></div>
-      <p>Uploading...</p>
-    `;
-    selectedCell.appendChild(loadingOverlay);
+  // Mostra un overlay di caricamento nella cella selezionata
+  const loadingOverlay = document.createElement("div");
+  loadingOverlay.classList.add("loading-overlay");
+  loadingOverlay.innerHTML = `
+    <div class="spinner"></div>
+    <p>Uploading...</p>
+  `;
+  selectedCell.appendChild(loadingOverlay);
 
-    const formData = new FormData();
-    formData.append("image", file);
-    formData.append("cellId", selectedCell.dataset.cellId);
+  const formData = new FormData();
+  formData.append("image", file);
+  formData.append("cellId", selectedCell.dataset.cellId);
 
-    try {
-      const response = await fetch("/upload", {
-        method: "POST",
-        body: formData,
-      });
+  try {
+    const response = await fetch("/upload", {
+      method: "POST",
+      body: formData,
+    });
 
-      if (response.ok) {
-        const data = await response.json();
+    if (response.ok) {
+      const data = await response.json();
 
-        // Update cell with new image
-        selectedCell.style.backgroundImage = `url(${data.imageUrl})`;
-        selectedCell.style.backgroundSize = "cover"; // Mantieni cover per adattamento
-        selectedCell.style.backgroundPosition = "center"; // Centra l'immagine
-        selectedCell.classList.add("occupied");
-
-        loadingOverlay.remove();
-      } else {
-        throw new Error("Caricamento fallito");
-      }
-    } catch (error) {
-      loadingOverlay.remove();
-      alert(`Errore: ${error.message}`);
-    } finally {
-      imageUploadInput.value = "";
-      selectedCell = null;
+      // Update cell with new image
+      selectedCell.style.backgroundImage = `url(${data.imageUrl})`;
+      selectedCell.style.backgroundSize = "cover";
+      selectedCell.style.backgroundPosition = "center";
+      selectedCell.classList.add("occupied");
+    } else {
+      throw new Error("Caricamento fallito");
     }
-  };
-
-  // Read the file as a data URL to preload
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    tempImg.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+  } catch (error) {
+    alert(`Errore: ${error.message}`);
+  } finally {
+    loadingOverlay.remove();
+    imageUploadInput.value = "";
+    selectedCell = null;
+  }
 };
 
 // Carica immagini esistenti all'avvio
