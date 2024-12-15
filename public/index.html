@@ -9,7 +9,7 @@
     />
     <title>Pixel Mosaic - Support a Dream</title>
 
-    <!-- Precarica font per migliorare LCP e FCP (font critical) -->
+    <!-- Precarica font per migliorare LCP (font critical) -->
     <link
       rel="preload"
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
@@ -17,14 +17,20 @@
       onload="this.onload=null;this.rel='stylesheet'"
     />
     
-    <!-- Precarica il CSS per migliorare LCP e FCP (critical CSS) -->
-    <link rel="preload" href="styles.css" as="style" />
+    <!-- Precarica il CSS critico per migliorare LCP -->
+    <style>
+      /* Includi qui i tuoi stili CSS critici per l'H1 */
+      body, h1 {
+        font-family: 'Roboto', sans-serif;
+      }
+    </style>
+
+    <!-- Carica il resto del CSS non critico in modo asincrono -->
+    <link rel="stylesheet" href="styles.css" />
 
     <!-- Caricamento asincrono dello script pubblicitario per evitare blocchi -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7872949213231201" crossorigin="anonymous"></script>
 
-    <!-- Ottimizzazione: Metti il CSS dentro il <head> per evitare il flash di contenuto non stilizzato -->
-    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header>
@@ -36,15 +42,12 @@
       </p>
     </header>
 
-    <!-- Griglia di pixel - Ottimizzazione potenziale per caricare solo le immagini visibili (lazy loading) -->
     <div id="grid-container"></div>
 
-    <!-- Sezione delle pubblicità -->
     <div class="ad-section">
       <p>Your clicks help! This site runs on ads to fund the dream.</p>
     </div>
 
-    <!-- Input file nascosto per il caricamento delle immagini -->
     <input
       type="file"
       id="image-upload"
@@ -52,7 +55,6 @@
       accept="image/*"
     />
 
-    <!-- Modal per la cella occupata -->
     <div class="modal" id="cell-occupied-modal">
       <div class="modal-content">
         <span class="close-btn">&times;</span>
@@ -63,13 +65,9 @@
       </div>
     </div>
 
-    <!-- Script per la gestione della logica - Usa 'defer' per caricarlo solo dopo il rendering -->
     <script defer src="scripts.js"></script>
 
-    <!-- Script per convertire le immagini in formato WebP o AVIF - Usa 'defer' per non bloccare il rendering -->
     <script defer src="webpjs-0.0.2.min.js"></script>
-
-    <!-- Script per la conversione delle immagini - Aggiunto un controllo per l'esistenza di Modernizr -->
     <script>
       if (typeof Modernizr !== 'undefined' && !Modernizr.webp) {
         var imgElements = document.getElementsByTagName("img");
@@ -81,6 +79,5 @@
         }
       }
     </script>
-
   </body>
 </html>
