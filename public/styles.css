@@ -70,12 +70,13 @@ p {
 
 /* Sezione delle pubblicità */
 .ad-section {
-  margin: 1rem auto;
+  margin: 2rem auto;
   text-align: center;
   background: rgba(255, 255, 255, 0.1);
   padding: 1rem;
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 10;
 }
 
 .ad-section p {
@@ -85,21 +86,6 @@ p {
   font-weight: bold;
 }
 
-/* Pulsante CTA (Call to Action) */
-.ad-section button {
-  background: #00b4d8;
-  color: #fff;
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.ad-section button:hover {
-  background: #0077b6;
-}
 
 /* Modale nascosta inizialmente */
 .modal {
