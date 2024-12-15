@@ -3,8 +3,50 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Support my dream by uploading your favorite anime image!"
+    />
     <title>Pixel Mosaic - Support a Dream</title>
-    <link rel="stylesheet" href="styles.css" />
+
+    <!-- Precarica font per migliorare LCP -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript
+      ><link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+        rel="stylesheet"
+    /></noscript>
+
+    <!-- CSS critico inline per velocizzare il rendering -->
+    <style>
+      body {
+        margin: 0;
+        font-family: "Roboto", sans-serif;
+        line-height: 1.5;
+        background: linear-gradient(135deg, #0077b6, #00b4d8, #90e0ef);
+        color: #fff;
+        text-align: center;
+        overflow-x: hidden;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin: 1rem 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      p {
+        font-size: 1.2rem;
+        margin: 0.5rem 0 1.5rem;
+        color: #dff6f8;
+      }
+    </style>
+
     <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7872949213231201"
@@ -27,13 +69,6 @@
     <div class="ad-section">
       <p>Your clicks help! This site runs on ads to fund the dream.</p>
       <!-- Aggiungi qui il codice di Google AdSense -->
-      <div style="margin: 20px auto; text-align: center">
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7872949213231201"
-          crossorigin="anonymous"
-        ></script>
-      </div>
     </div>
 
     <!-- Input file nascosto -->
