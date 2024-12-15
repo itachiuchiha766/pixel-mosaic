@@ -46,14 +46,6 @@
     <!-- Sezione delle pubblicità -->
     <div class="ad-section">
       <p>Your clicks help! This site runs on ads to fund the dream.</p>
-      <!-- Aggiungi qui il codice di Google AdSense -->
-      <div style="margin: 20px auto; text-align: center">
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7872949213231201"
-          crossorigin="anonymous"
-        ></script>
-      </div>
     </div>
 
     <!-- Input file nascosto -->
@@ -76,6 +68,20 @@
     </div>
 
     <!-- Script per la gestione della logica -->
-    <script src="scripts.js"></script>
+    <script defer src="scripts.js"></script>
+
+    <!--Script per convertire immagini in formato WebP o AVIS-->
+    <script defer src="webpjs-0.0.2.min.js"></script>
+    <script>
+      if (!Modernizr.webp) {
+        var imgElements = document.getElementsByTagName("img");
+        for (var i = 0; i < imgElements.length; i++) {
+          imgElements[i].src = imgElements[i].src.replace(
+            /\.(jpg|jpeg|png)/,
+            ".webp"
+          );
+        }
+      }
+    </script>
   </body>
 </html>

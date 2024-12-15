@@ -108,9 +108,9 @@ imageUploadInput.onchange = async (event) => {
   const loadingOverlay = document.createElement("div");
   loadingOverlay.classList.add("loading-overlay");
   loadingOverlay.innerHTML = `
-    <div class="spinner"></div>
-    <p>Uploading...</p>
-  `;
+  <div class="spinner"></div>
+`;
+  selectedCell.style.position = "relative"; // Assicurati che la cella abbia una posizione relativa
   selectedCell.appendChild(loadingOverlay);
 
   const formData = new FormData();
