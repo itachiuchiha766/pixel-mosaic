@@ -41,6 +41,7 @@ p {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
   padding: 10px;
   border: 2px solid #fff;
+  will-change: transform; /* Performance hint */
 }
 
 /* Celle dei pixel */
@@ -55,6 +56,7 @@ p {
   border-radius: 5px; /* Aggiungi bordi arrotondati per visibilità */
   overflow: hidden;
   box-sizing: border-box;
+  contain: layout paint; /* Performance optimization */
 }
 
 .grid-cell img {

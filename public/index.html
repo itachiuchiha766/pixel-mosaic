@@ -9,40 +9,60 @@
     />
     <title>Pixel Mosaic - Support a Dream</title>
 
-    <!-- Precarica font per migliorare LCP (font critical) -->
+    <!-- Critical CSS inlined to reduce render-blocking resources -->
+    <style>
+      body, h1 {
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        color: #fff;
+      }
+      body {
+        background: linear-gradient(135deg, #0077b6, #00b4d8, #90e0ef);
+        text-align: center;
+      }
+      h1 {
+        font-size: 2.5rem;
+        margin: 1rem 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+    </style>
+
+    <!-- Optimize font loading -->
     <link
       rel="preload"
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
       as="style"
       onload="this.onload=null;this.rel='stylesheet'"
     />
-    
-    <!-- Precarica il CSS critico per migliorare LCP -->
-    <style>
-      /* Includi qui i tuoi stili CSS critici per l'H1 */
-      body, h1 {
-        font-family: 'Roboto', sans-serif;
-      }
-    </style>
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      />
+    </noscript>
 
-    <!-- Carica il resto del CSS non critico in modo asincrono -->
-    <link rel="stylesheet" href="styles.css" />
+    <!-- Async CSS loading -->
+    <link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'" />
+    <noscript>
+      <link rel="stylesheet" href="styles.css" />
+    </noscript>
 
-    <!-- Caricamento asincrono dello script pubblicitario per evitare blocchi -->
+    <!-- Performance optimizations for scripts -->
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+
+    <!-- Async loading of advertising and analytics scripts -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7872949213231201" crossorigin="anonymous"></script>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-SPVQPD28HJ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-SPVQPD28HJ');
-</script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SPVQPD28HJ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SPVQPD28HJ');
+    </script>
   </head>
   <body>
     <header>
-      <!-- Testo H1 migliorato per il LCP -->
       <h1>Help Me Buy My Parents Their Dream House</h1>
       <p>
         Click on a pixel, upload your favourite anime image and support this
@@ -73,9 +93,9 @@
       </div>
     </div>
 
-    <script defer src="scripts.js"></script>
-
+    <!-- Defer loading of scripts -->
     <script defer src="webpjs-0.0.2.min.js"></script>
+    <script defer src="scripts.js"></script>
     <script>
       if (typeof Modernizr !== 'undefined' && !Modernizr.webp) {
         var imgElements = document.getElementsByTagName("img");

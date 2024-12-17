@@ -3,6 +3,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const sharp = require("sharp"); // Aggiungi questa libreria per ridimensionamento
+const compression = require("compression"); // Add compression middleware
 
 const app = express();
 const PORT = 3000;
@@ -19,6 +20,9 @@ if (!fs.existsSync(uploadDir)) {
 if (!fs.existsSync(databaseFile)) {
   fs.writeFileSync(databaseFile, JSON.stringify({}), "utf8");
 }
+
+// Compression middleware
+app.use(compression());
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -77,10 +81,10 @@ app.post("/upload", upload.single("image"), async (req, res) => {
         fit: sharp.fit.cover,
         position: sharp.strategy.attention,
       })
-      .png()
-      .toFile(path.join(uploadDir, `${cellId}.png`));
+      .webp({ quality: 80 }) // Use WebP for smaller file sizes
+      .toFile(path.join(uploadDir, `${cellId}.webp`));
 
-    const imageUrl = `/uploads/${cellId}.png`;
+    const imageUrl = `/uploads/${cellId}.webp`;
 
     // Aggiorna database delle immagini
     updateImageDatabase(cellId, imageUrl);
@@ -99,7 +103,7 @@ app.post("/upload", upload.single("image"), async (req, res) => {
 // Endpoint per eliminare un'immagine
 app.delete("/delete/:cellId", (req, res) => {
   const cellId = req.params.cellId;
-  const filePath = path.join(uploadDir, `${cellId}.png`);
+  const filePath = path.join(uploadDir, `${cellId}.webp`);
 
   try {
     // Rimuovi file se esiste
