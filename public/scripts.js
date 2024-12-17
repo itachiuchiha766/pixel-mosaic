@@ -10,18 +10,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const totalCells = 400;
   let selectedCell = null;
 
-  // Lazy load grid cells
+  // Ripristinata la creazione originale delle celle con miglioramenti
   function lazyLoadGridCells() {
     const fragment = document.createDocumentFragment();
     for (let i = 0; i < totalCells; i++) {
       const cell = document.createElement("div");
       cell.classList.add("grid-cell");
       cell.dataset.cellId = i;
-      cell.setAttribute('loading', 'lazy'); // Native lazy loading
+      cell.setAttribute('loading', 'lazy');
 
-      cell.addEventListener("click", () => {
+      // Ripristinato il comportamento originale dell'hover e del click
+      cell.addEventListener("click", (event) => {
+        event.preventDefault();
         if (cell.classList.contains("occupied")) {
-          showModal();
+          // Passa l'elemento cella alla funzione showModal
+          showModal(cell);
         } else {
           selectedCell = cell;
           imageUploadInput.click();
@@ -33,12 +36,18 @@ document.addEventListener('DOMContentLoaded', () => {
     gridContainer.appendChild(fragment);
   }
 
-  function showModal() {
+  // Modificata per accettare la cella specifica
+  function showModal(occupiedCell) {
     modal.style.display = "flex";
+    
+    // Aggiungi un attributo per tracciare la cella occupata
+    modal.dataset.cellId = occupiedCell.dataset.cellId;
   }
 
   function closeModal() {
     modal.style.display = "none";
+    // Rimuovi il dataset quando chiudi
+    delete modal.dataset.cellId;
   }
 
   modal.addEventListener("click", (event) => {
@@ -50,11 +59,12 @@ document.addEventListener('DOMContentLoaded', () => {
   closeModalButton.addEventListener("click", closeModal);
   chooseDifferentCellButton.addEventListener("click", closeModal);
 
+  // Ripristinata la logica originale di rimozione immagine
   removeImageButton.addEventListener("click", async () => {
-    const occupiedCell = document.querySelector(".grid-cell.occupied");
-    if (occupiedCell) {
-      const cellId = occupiedCell.dataset.cellId;
+    const cellId = modal.dataset.cellId;
+    const occupiedCell = document.querySelector(`.grid-cell[data-cell-id="${cellId}"]`);
 
+    if (occupiedCell) {
       try {
         const response = await fetch(`/delete/${cellId}`, { method: "DELETE" });
 
@@ -86,7 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Mostra un overlay di caricamento nella cella selezionata
     const loadingOverlay = document.createElement("div");
     loadingOverlay.classList.add("loading-overlay");
     loadingOverlay.innerHTML = `
@@ -108,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (response.ok) {
         const data = await response.json();
 
-        // Update cell with new image
         selectedCell.style.backgroundImage = `url(${data.imageUrl})`;
         selectedCell.style.backgroundSize = "cover";
         selectedCell.style.backgroundPosition = "center";
