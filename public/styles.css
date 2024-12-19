@@ -79,23 +79,6 @@ p {
   transition: transform 0.1s;
 }
 
-/* Sezione delle pubblicità */
-.ad-section {
-  margin: 2rem auto;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  z-index: 10;
-}
-
-.ad-section p {
-  font-size: 1.4rem;
-  margin: 0.5rem 0;
-  color: #dff6f8;
-  font-weight: bold;
-}
 
 /* Modale nascosta inizialmente */
 .modal {
@@ -175,14 +158,6 @@ button:hover {
   p {
     font-size: 1rem;
   }
-
-  .ad-section p {
-    font-size: 1.1rem;
-  }
-
-  .ad-section button {
-    font-size: 0.9rem;
-  }
 }
 
 /* Celle occupate con immagini */
@@ -225,3 +200,4 @@ button:hover {
     transform: rotate(360deg);
   }
 }
+
